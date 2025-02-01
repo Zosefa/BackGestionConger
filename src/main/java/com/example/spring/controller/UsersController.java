@@ -36,10 +36,21 @@ public class UsersController {
     public ResponseEntity<Object> login(@RequestBody ConnexionRequest connexion) throws Exception{
         try {
             Users users = usersService.findByEmailAndPassword(connexion.getEmail(), connexion.getPassword());
-            return new ResponseEntity<>("token : " + JWT.generateToken(users), HttpStatus.OK);
+            return new ResponseEntity<>(JWT.generateToken(users), HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    @GetMapping("/real")
+    public ResponseEntity<Object> realToken(@RequestHeader("Authorization") String token){
+        System.out.println(token);
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        String Email = JWT.getClaim(token, "email");
+        return ResponseEntity.ok(Email);
+        
     }
 
     @PostMapping("/logout")
